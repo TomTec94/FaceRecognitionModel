@@ -7,56 +7,99 @@ The used FER Dataset is too huge for uploading. That is why it has to be downloa
 The Tensorboard logs with the different Modeltraining runs are added in a ZIP File.
 The best performing model is added as well.
 
+# Face Recognition Emotion Detection Model - README
 
-# Face Recognition Model for Emotion Detection
+## Introduction
 
-This project aims to implement a tool that detects the emotional state of a person based on facial expressions. The system uses a deep learning model built with PyTorch to classify images into different emotional states.
+This notebook contains the code for developing a Convolutional Neural Network (CNN) model that predicts the emotional state of a person based on a given image of their face. The model has been trained to classify four emotions: **Angry**, **Happy**, **Sad**, and **Neutral**. The pre-trained model (`best_model.pth`) is used to make predictions on new input images.
 
-## Table of Contents
+## Prerequisites
 
-- [Installation](#installation)
-- [Making Predictions](#making-predictions)
-- [Usage](#usage)
+- Python 3.7 or higher
+- Jupyter Notebook environment (e.g., Google Colab, Jupyter Lab, or Jupyter Notebook)
+- PyTorch and related libraries:
+  - Install using:
+    ```sh
+    !pip install torch torchvision lightning pandas matplotlib tensorboard
+    ```
+- Google Drive mounted for storing datasets and model (optional if using Google Colab)
 
-## Installation
+## Steps to Make Predictions with a Custom Input Face Image
 
-### Step 1: Set up the Environment
+### Step 1: Load the Pre-Trained Model
 
-First, you need to connect Google Drive to access the dataset and install the required packages. Use Google Colab for seamless access to Google Drive.
+1. Ensure that the pre-trained model file (`best_model.pth`) is available in the specified directory (e.g., Google Drive or local directory).
+2. Load the model as follows:
+    ```python
+    import torch
+    model_path = '/content/drive/MyDrive/modelruns/saved_models/best_model.pth'  # Adjust the path as needed
+    model = FaceRecModel()
+    checkpoint = torch.load(model_path)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    model.eval()
+    print('Model loaded successfully and ready for further use.')
+    ```
 
-To prepare the environment, run the following code:
+### Step 2: Install Required Libraries
 
-```python
-from google.colab import drive
-drive.mount('/content/drive')
-!pip install torch torchvision pandas matplotlib torchviz tensorboard lightning
+Install the `Pillow` library for image handling (if not already installed):
+```sh
+!pip install Pillow
 ```
 
-## Making Predictions
+### Step 3: Prepare the Custom Input Image
 
-### Step 2: Load the Model for Prediction
+1. Select a facial image you want to classify.
+2. Load and preprocess the image:
+    ```python
+    from PIL import Image
+    from torchvision import transforms
 
-Since the model has already been trained, you can load it directly to make predictions on new images. Use the following code to load the model:
+    # Define the transformation steps
+    transform = transforms.Compose([
+        transforms.Resize((48, 48)),
+        transforms.Grayscale(),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.5], std=[0.5])
+    ])
 
+    # Load the image and apply the transformations
+    image_path = '/content/drive/MyDrive/new_images/custom_image.jpg'  # Replace with your image path
+    image = Image.open(image_path)
+    image = transform(image)
+    image = image.unsqueeze(0)  # Add batch dimension
+    ```
+
+### Step 4: Predict the Emotion
+
+Run the following code to get a prediction:
 ```python
-model = setup_model_for_prediction('/content/drive/MyDrive/modelruns/saved_models/best_model.pth')
+with torch.no_grad():
+    output = model(image)
+    _, predicted = torch.max(output, 1)
+    emotion_mapping = {0: 'Angry', 1: 'Happy', 2: 'Sad', 3: 'Neutral'}
+    predicted_emotion = emotion_mapping[predicted.item()]
+
+print(f"Predicted Emotion: {predicted_emotion}")
 ```
 
-### Step 3: Predict Emotion from New Images
-
-To make predictions on new images:
+### Step 5: Visualize the Input Image with Predicted Emotion
 
 ```python
-predict_emotion(model, '/content/drive/MyDrive/new_images/[image_name].jpg')
+import matplotlib.pyplot as plt
+
+image_np = image.squeeze().numpy()
+plt.imshow(image_np, cmap='gray')
+plt.title(f"Predicted Emotion: {predicted_emotion}")
+plt.axis('off')
+plt.show()
 ```
 
-This function will output the predicted emotion for the given image.
+## Summary
 
-## Usage
+You have now successfully loaded a pre-trained model and used it to make a prediction on a custom input image. The model predicts one of four emotional states (Angry, Happy, Sad, or Neutral) based on the input facial image.
 
-1. **Environment Setup**: Use the provided steps to set up the environment for running the model.
-2. **Load the Model**: Use `setup_model_for_prediction()` to load the pre-trained model.
-3. **Make Predictions**: Use `predict_emotion()` to make predictions on unseen images.
+If you encounter any issues, ensure that all necessary packages are installed and that the model path is correct.
 
-With these steps, the model is ready to use for recognizing emotional states from facial expressions in images.
+
 
