@@ -31,26 +31,26 @@ This notebook contains the code for developing a Convolutional Neural Network (C
 1. Deploy the following Code (Run Cell) to initialize the model parameter (You can adjust these Model paramter if needed - but this configuartion works fine:
    ```python
    # Model Parameters
-    NUM_CLASSES = 4          # number of emotions
-    INPUT_CHANNELS = 1       # number of input channels (1, since gray)
-    KERNEL_SIZE = 3          # Kernel size of conv-layer
-    HIDDEN_UNITS = 128       # in fc-layer
-    DROPOUT_RATE = 0.3       # dropout rate to prevent overfitting
+   NUM_CLASSES = 4          # number of emotions
+   INPUT_CHANNELS = 1       # number of input channels (1, since gray)
+   KERNEL_SIZE = 3          # Kernel size of conv-layer
+   HIDDEN_UNITS = 128       # in fc-layer
+   DROPOUT_RATE = 0.3       # dropout rate to prevent overfitting
    ```
    
 2. Deploy the following Code (Run Cell) to initialize the model class:
    ```python
-    import torch
-    import torch.nn as nn
-    import torch.nn.functional as F
+   import torch
+import torch.nn as nn
+import torch.nn.functional as F
 
-    class FaceRecModel(nn.Module):
+class FaceRecModel(nn.Module):
     
     #A Convolutional Neural Network (CNN) model for face recognition.
 
-    The model consists of multiple convolutional layers followed by max pooling, batch normalization,
-    fully connected layers, and dropout for regularization.
-    """
+    #The model consists of multiple convolutional layers followed by max pooling, batch normalization,
+    #fully connected layers, and dropout for regularization.
+    
     def __init__(self):
         super(FaceRecModel, self).__init__()
         # Convolutional layers
